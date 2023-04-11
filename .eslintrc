@@ -14,6 +14,8 @@
 		"linebreak-style": ["error", "unix"],
 		"quotes": ["error", "double"],
 		"semi": ["error", "always"],
-		"capitalized-comments": ["warn"]
+		"capitalized-comments": ["warn"],
+		"arrow-parens": "off",
+		"object-curly-spacing": "off"
 	}
 }
