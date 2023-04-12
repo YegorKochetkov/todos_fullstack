@@ -16,6 +16,7 @@
 		"semi": ["error", "always"],
 		"capitalized-comments": ["off"],
 		"arrow-parens": "off",
-		"object-curly-spacing": "off"
+		"object-curly-spacing": "off",
+		"comma-dangle": "off"
 	}
 }
