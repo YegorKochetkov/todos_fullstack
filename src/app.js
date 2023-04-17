@@ -1,65 +1,35 @@
 import http from "http";
-import fs from "fs";
+import {} from "stream";
 
 const server = new http.Server();
 
+// process.stdin.pipe(process.stdout);
+// process.stdin.pipe(fs.createWriteStream("./src/copy.txt"));
+process.stdin.on("data", (chunk) => {
+	setTimeout(() => {
+		process.stdout.write("data stream in console with timeout - " + chunk);
+	}, 1000);
+});
+
 server.on("request", (req, res) => {
-	if (req.url === "/download") {
-		const videoStream = fs.createReadStream("src/video.mp4");
+	res.setHeader("Content-Type", "text/html");
+	res.write("<h1>Streams</h1>");
 
-		videoStream.pipe(res);
-
-		videoStream.on("open", () => {
-			res.setHeader("Content-Type", "video/mp4");
-			res.setHeader(
-				"Content-Disposition",
-				"attachment; filename=mate-video.mp4"
-			);
-		});
-
-		videoStream.on("end", () => {
-			console.log(process.memoryUsage().external);
-		});
-
-		videoStream.on("error", (error) => {
-			console.error(error);
-			res.statusCode = 500;
-			res.write(`Server error: ${error}`);
-			res.end();
-		});
-
-		// fs.readFile("src/video.mp4", (error, content) => {
-		// 	if (error) {
-		// 		console.error(error);
-		// 		res.statusCode = 500;
-		// 		res.end("Server error");
-
-		// 		return;
-		// 	}
-
-		// 	if (content) {
-		// 		res.setHeader("Content-Type", "video/mp4");
-		// 		res.setHeader(
-		// 			"Content-Disposition",
-		// 			"attachment; filename=mate-video.mp4"
-		// 		);
-		// 		res.end(content);
-		// 	}
-		// });
+	for (let i = 5; i > 0; i--) {
+		setTimeout(() => {
+			res.write(`<p>${i}</p>`);
+		}, (5 - i) * 1000);
 	}
 
-	if (req.url === "/") {
-		res.setHeader("Content-Type", "text/html");
-		res.end(`
-			<a href="/download" target="_blanc">
-				Download file
-			</a>
-		`);
-	}
+	setTimeout(() => {
+		res.end("<p>Done!</p>");
+	}, 5000);
 });
 
 server.on("error", (error) => {
-	console.error(error);
+	console.error(`Error: ${error}`);
 });
 
-server.listen(3000, () => console.log("server is running on localhost:3000"));
+server.listen(3000, () =>
+	console.log("server is running on http://localhost:3000")
+);
