@@ -1,33 +1,32 @@
 import http from "http";
-import {} from "stream";
+import fs from "fs";
 
 const server = new http.Server();
 
-// process.stdin.pipe(process.stdout);
-// process.stdin.pipe(fs.createWriteStream("./src/copy.txt"));
-process.stdin.on("data", (chunk) => {
-	setTimeout(() => {
-		process.stdout.write("data stream in console with timeout - " + chunk);
-	}, 1000);
-});
-
 server.on("request", (req, res) => {
-	res.setHeader("Content-Type", "text/html");
-	res.write("<h1>Streams</h1>");
-
-	for (let i = 5; i > 0; i--) {
-		setTimeout(() => {
-			res.write(`<p>${i}</p>`);
-		}, (5 - i) * 1000);
+	if (req.url === "/favicon.ico") {
+		res.end();
+		return;
 	}
 
-	setTimeout(() => {
-		res.end("<p>Done!</p>");
-	}, 5000);
+	const filename = req.url === "/" ? "package.json" : "wrong_file_name";
+	const filePackage = fs.createReadStream(filename);
+
+	filePackage.on("open", () => {
+		res.setHeader("Content-Type", "text/json");
+	});
+
+	filePackage.on("error", (error) => {
+		res.statusCode = 404;
+		res.write(`Wrong file name: ${error}`);
+		res.end();
+	});
+
+	filePackage.pipe(res);
 });
 
 server.on("error", (error) => {
-	console.error(`Error: ${error}`);
+	console.error(error);
 });
 
 server.listen(3000, () =>

@@ -16,6 +16,7 @@ const server = http.createServer((req, res) => {
 	// const fileName = req.url.slice(1) || "index.html";
 	// const fileName = req.url.slice(1).replace(/\.\.\//g, "") || "index.html";
 	const fileName = normalizeUrl.pathname.slice(1) || "index.html";
+	console.log("🚀 ~ file: app.js:19 ~ fileName:", fileName);
 
 	fs.readFile(`./public/${fileName}`, (error, data) => {
 		if (error) {
