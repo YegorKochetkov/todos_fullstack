@@ -9,7 +9,7 @@ server.on("request", (req, res) => {
 		return;
 	}
 
-	const filename = req.url === "/" ? "package.json" : "wrong_file_name";
+	const filename = req.url === "/" ? "package-lock.json" : "wrong_file_name";
 	const filePackage = fs.createReadStream(filename);
 
 	filePackage.on("open", () => {
@@ -31,7 +31,24 @@ server.on("request", (req, res) => {
 		console.log("close");
 	});
 
-	filePackage.pipe(res);
+	// filePackage.pipe(res);
+	filePackage.on("data", (chunk) => {
+		const canProceed = res.write(chunk);
+
+		if (canProceed) {
+			return;
+		}
+
+		filePackage.pause();
+
+		res.once("drain", () => {
+			filePackage.resume();
+		});
+	});
+
+	filePackage.on("end", () => {
+		res.end();
+	});
 });
 
 server.on("error", (error) => {
