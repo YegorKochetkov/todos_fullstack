@@ -1,53 +1,54 @@
 import http from "http";
 import fs from "fs";
+import path from "path";
+import zlib from "zlib";
+// import { pipeline } from "stream";
 
 const server = new http.Server();
 
 server.on("request", (req, res) => {
-	if (req.url === "/favicon.ico") {
-		res.end();
+	const url = new URL(req.url, `http://${req.headers.host}`);
+	const fileName = url.pathname.slice(1) || "index.html";
+	const filePath = path.resolve("public", fileName);
+
+	if (!fs.existsSync(filePath)) {
+		res.statusCode = 404;
+		res.end("File does not exist");
 		return;
 	}
 
-	const filename = req.url === "/" ? "package-lock.json" : "wrong_file_name";
-	const filePackage = fs.createReadStream(filename);
+	res.setHeader("Content-Encoding", "gzip");
 
-	filePackage.on("open", () => {
-		console.log("open");
-		res.setHeader("Content-Type", "text/json");
-	});
+	const file = fs.createReadStream(filePath);
+	const gzip = zlib.createGzip();
 
-	filePackage.on("error", (error) => {
-		res.statusCode = 404;
-		res.write(`Wrong file name: ${error}`);
-		res.end();
+	file
+		.on("error", (error) => {
+			console.error("Something went wrong on file reading ", error);
+		})
+		.pipe(gzip)
+		.on("error", (error) => {
+			console.error("Something went wrong on compressing ", error);
+		})
+		.pipe(res)
+		.on("error", (error) => {
+			console.error("Something went wrong on server", error);
+		});
+
+	// pipeline(file, gzip, res, (error) => {
+	// 	if (error) {
+	// 		console.error("Something went wrong on pipeline ", error);
+	// 	}
+	// });
+
+	file.on("error", (error) => {
+		console.error(error);
+		res.statusCode = 500;
+		res.end("Something went wrong");
 	});
 
 	res.on("close", () => {
-		filePackage.destroy();
-	});
-
-	filePackage.on("close", () => {
-		console.log("close");
-	});
-
-	// filePackage.pipe(res);
-	filePackage.on("data", (chunk) => {
-		const canProceed = res.write(chunk);
-
-		if (canProceed) {
-			return;
-		}
-
-		filePackage.pause();
-
-		res.once("drain", () => {
-			filePackage.resume();
-		});
-	});
-
-	filePackage.on("end", () => {
-		res.end();
+		file.destroy();
 	});
 });
 
