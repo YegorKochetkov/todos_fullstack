@@ -1,46 +1,30 @@
-// import http from "http";
-import axios from "axios";
+import http from "http";
 
-const BASE = "http://localhost:3000";
-const pathname = "/users/3/friends";
-const search = "?sex=m&age=23&age=33";
+const url = "http://localhost:3000";
+const options = { method: "post" };
 
-const href = BASE + pathname + search;
+const data = { x: 3, y: 4 };
 
-axios
-	.get(href)
-	.then((res) => {
-		console.log(res.status);
-		console.log(res.data);
-	})
-	.catch((error) => {
-		console.log(error.response.status);
-		console.log(error.response.statusText);
+const req = http.request(url, options, (res) => {
+	// res.pipe(process.stdout);
+	// console.log(res.statusCode);
+
+	const chunks = [];
+
+	res.on("data", (chunk) => {
+		chunks.push(chunk);
 	});
 
-// const options = {
-// 	hostname: "localhost",
-// 	port: 3000,
-// 	path: "/../src/app.js",
-// };
+	res.on("end", () => {
+		// const bodyFromServer = Buffer.concat(chunks).toString();
+		// console.log(bodyFromServer);
 
-// http.get(options, (res) => {
-// 	res.setEncoding("utf-8");
-// 	res.on("data", console.log);
-// });
+		const bodyFromServer = Buffer.concat(chunks).toString();
+		const dataFromServer = JSON.parse(bodyFromServer);
+		console.log(bodyFromServer);
+		console.log(dataFromServer);
+		console.log(dataFromServer.x + dataFromServer.y);
+	});
+});
 
-// const req = http.request("http://dlocalhost:3000", (res) => {
-// 	console.log(res.statusCode);
-
-// 	res.setEncoding("utf-8");
-
-// 	res.on("data", (data) => {
-// 		console.log(data);
-// 	});
-// });
-
-// req.on("error", (error) => {
-// 	console.error("Error: ", error.message);
-// });
-
-// req.end();
+req.end(JSON.stringify(data));
