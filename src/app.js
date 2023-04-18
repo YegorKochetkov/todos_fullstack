@@ -13,6 +13,7 @@ server.on("request", (req, res) => {
 	const filePackage = fs.createReadStream(filename);
 
 	filePackage.on("open", () => {
+		console.log("open");
 		res.setHeader("Content-Type", "text/json");
 	});
 
@@ -20,6 +21,14 @@ server.on("request", (req, res) => {
 		res.statusCode = 404;
 		res.write(`Wrong file name: ${error}`);
 		res.end();
+	});
+
+	res.on("close", () => {
+		filePackage.destroy();
+	});
+
+	filePackage.on("close", () => {
+		console.log("close");
 	});
 
 	filePackage.pipe(res);
