@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const data = { x: 1, y: 2 };
-const url = "http://localhost:3000/api";
+const url = "http://localhost:3000";
 
-axios.post(url, data);
+axios
+	.get(url + "/todos")
+	.then((res) => console.log(res.data))
+	.catch((error) => console.log(error));

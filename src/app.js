@@ -1,44 +1,42 @@
 import express from "express";
-// import path from "path";
+import cors from "cors";
+
+const corsOptions = {
+	origin: "http://localhost:5173",
+	optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+
+const todos = [
+	{ id: "1", title: "html", completed: true },
+	{ id: "2", title: "css", completed: false },
+	{ id: "3", title: "js", completed: false },
+];
 
 const port = process.env.port || 3000;
 const app = express();
 
+app.use(cors(corsOptions));
 app.use(express.static("public"));
-// app.use(express.urlencoded({ extended: true }));
 
-app.post("/api", express.json(), (req, res) => {
-	console.log(req.body);
-	res.end("Done!");
+app.get("/api_v1/todos", (req, res) => {
+	res.send(todos);
 });
-// app.post("/api", express.urlencoded({ extended: true }), (req, res) => {
-// 	console.log(req.body);
-// 	res.end("Done!");
-// });
+
+app.get("/api_v1/todos/:todoId", (req, res) => {
+	const { todoId } = req.params;
+	const requestedTodo = todos.find((todo) => todo.id === todoId);
+
+	if (!requestedTodo) {
+		res.sendStatus(404);
+		return;
+	}
+
+	res.send(requestedTodo);
+});
 
 app.use("/", (_req, res) => {
 	res.sendStatus(404);
 });
-
-// app.use("/", (req, res) => {
-// 	const pathFile = path.resolve("public", "index.html");
-// 	console.log("🚀 ~ file: app.js:9 ~ pathFile:", pathFile);
-// 	res.sendFile(pathFile);
-
-// res.send("Express lessons");
-// res.sendStatus(505);
-// res.setHeader("Content-Type", "text/html");
-// res.end("Express lessons");
-// });
-
-// app.use("/", async (req, res, next) => {
-// 	res.write("<h1>Use request</h1>");
-// 	next();
-// });
-
-// app.get("/123", async (req, res) => {
-// 	res.end("<h1>Get request more strict</h1>");
-// });
 
 app.listen(port, () =>
 	console.log(`server is running on http://localhost:${port}`)
