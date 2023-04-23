@@ -1,12 +1,13 @@
 import express from "express";
 import cors from "cors";
+import { randomUUID } from "crypto";
 
 const corsOptions = {
 	origin: "http://localhost:5173",
 	optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 
-const todos = [
+let todos = [
 	{ id: "1", title: "html", completed: true },
 	{ id: "2", title: "css", completed: false },
 	{ id: "3", title: "js", completed: false },
@@ -32,6 +33,40 @@ app.get("/api_v1/todos/:todoId", (req, res) => {
 	}
 
 	res.send(requestedTodo);
+});
+
+app.post("/api_v1/todos", express.json(), (req, res) => {
+	const { title } = req.body;
+
+	if (!title) {
+		res.sendStatus(422);
+		return;
+	}
+
+	const newTodo = {
+		id: randomUUID(),
+		title,
+		completed: false,
+	};
+
+	todos.push(newTodo);
+
+	res.statusCode = 201;
+	res.send(newTodo);
+});
+
+app.delete("/api_v1/todos/:todoId", (req, res) => {
+	const { todoId } = req.params;
+
+	const updatedTodos = todos.filter((todo) => todo.id !== todoId);
+
+	if (updatedTodos.length === todos.length) {
+		res.sendStatus(404);
+		return;
+	}
+
+	todos = updatedTodos;
+	res.sendStatus(204);
 });
 
 app.use("/", (_req, res) => {
