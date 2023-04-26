@@ -19,11 +19,11 @@ const app = express();
 app.use(cors(corsOptions));
 app.use(express.static("public"));
 
-app.get("/api_v1/todos", (req, res) => {
+app.get("/api/v1/todos", (req, res) => {
 	res.send(todos);
 });
 
-app.get("/api_v1/todos/:todoId", (req, res) => {
+app.get("/api/v1/todos/:todoId", (req, res) => {
 	const { todoId } = req.params;
 	const requestedTodo = todos.find((todo) => todo.id === todoId);
 
@@ -35,7 +35,27 @@ app.get("/api_v1/todos/:todoId", (req, res) => {
 	res.send(requestedTodo);
 });
 
-app.post("/api_v1/todos", express.json(), (req, res) => {
+app.put("/api/v1/todos/:todoId", express.json(), (req, res) => {
+	const { todoId } = req.params;
+	const foundTodo = todos.find((todo) => todo.id === todoId);
+
+	if (!foundTodo) {
+		res.sendStatus(404);
+		return;
+	}
+
+	const { title, completed } = req.body;
+
+	if (typeof title !== "string" || typeof completed !== "boolean") {
+		res.sendStatus(422);
+		return;
+	}
+
+	Object.assign(foundTodo, { title, completed });
+	res.send(foundTodo);
+});
+
+app.post("/api/v1/todos", express.json(), (req, res) => {
 	const { title } = req.body;
 
 	if (!title) {
@@ -55,7 +75,7 @@ app.post("/api_v1/todos", express.json(), (req, res) => {
 	res.send(newTodo);
 });
 
-app.delete("/api_v1/todos/:todoId", (req, res) => {
+app.delete("/api/v1/todos/:todoId", (req, res) => {
 	const { todoId } = req.params;
 
 	const updatedTodos = todos.filter((todo) => todo.id !== todoId);
@@ -67,6 +87,35 @@ app.delete("/api_v1/todos/:todoId", (req, res) => {
 
 	todos = updatedTodos;
 	res.sendStatus(204);
+});
+
+app.patch("/api/v1/todos", express.json(), (req, res) => {
+	const { action } = req.query;
+
+	if (action === "delete") {
+		const { ids } = req.body;
+
+		const filteredTodos = todos.filter((todo) => !ids.includes(todo.id));
+		todos = filteredTodos;
+		res.sendStatus(204);
+		return;
+	}
+
+	if (action === "update") {
+		const { items } = req.body;
+
+		for (const { id, completed, title } of items) {
+			const foundTodo = todos.find((todo) => todo.id === id);
+
+			if (!foundTodo) {
+				continue;
+			}
+
+			Object.assign(foundTodo, { title, completed });
+		}
+
+		res.sendStatus(200);
+	}
 });
 
 app.use("/", (_req, res) => {
