@@ -19,10 +19,12 @@ const app = express();
 app.use(cors(corsOptions));
 app.use(express.static("public"));
 
+// Get all todos
 app.get("/api/v1/todos", (req, res) => {
 	res.send(todos);
 });
 
+// Get todo
 app.get("/api/v1/todos/:todoId", (req, res) => {
 	const { todoId } = req.params;
 	const requestedTodo = todos.find((todo) => todo.id === todoId);
@@ -35,6 +37,7 @@ app.get("/api/v1/todos/:todoId", (req, res) => {
 	res.send(requestedTodo);
 });
 
+// Update todo
 app.put("/api/v1/todos/:todoId", express.json(), (req, res) => {
 	const { todoId } = req.params;
 	const foundTodo = todos.find((todo) => todo.id === todoId);
@@ -55,6 +58,7 @@ app.put("/api/v1/todos/:todoId", express.json(), (req, res) => {
 	res.send(foundTodo);
 });
 
+// Add todo
 app.post("/api/v1/todos", express.json(), (req, res) => {
 	const { title } = req.body;
 
@@ -75,6 +79,7 @@ app.post("/api/v1/todos", express.json(), (req, res) => {
 	res.send(newTodo);
 });
 
+// Delete todo
 app.delete("/api/v1/todos/:todoId", (req, res) => {
 	const { todoId } = req.params;
 
@@ -89,11 +94,17 @@ app.delete("/api/v1/todos/:todoId", (req, res) => {
 	res.sendStatus(204);
 });
 
+// Update\delete several todos
 app.patch("/api/v1/todos", express.json(), (req, res) => {
 	const { action } = req.query;
 
 	if (action === "delete") {
 		const { ids } = req.body;
+
+		if (!Array.isArray(ids)) {
+			res.sendStatus(422);
+			return;
+		}
 
 		const filteredTodos = todos.filter((todo) => !ids.includes(todo.id));
 		todos = filteredTodos;
@@ -103,6 +114,11 @@ app.patch("/api/v1/todos", express.json(), (req, res) => {
 
 	if (action === "update") {
 		const { items } = req.body;
+
+		if (!Array.isArray(items)) {
+			res.sendStatus(422);
+			return;
+		}
 
 		for (const { id, completed, title } of items) {
 			const foundTodo = todos.find((todo) => todo.id === id);
@@ -115,7 +131,10 @@ app.patch("/api/v1/todos", express.json(), (req, res) => {
 		}
 
 		res.sendStatus(200);
+		return;
 	}
+
+	res.sendStatus(400);
 });
 
 app.use("/", (_req, res) => {
