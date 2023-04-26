@@ -6,28 +6,24 @@
 		<title>Node Lessons</title>
 	</head>
 	<body>
-		<h1>Sign in</h1>
-		<form action="/api" method="post">
-			<label htmlFor="email">Email:</label>
-			<input
-				type="email"
-				name="email"
-				id="email"
-				placeholder="your@email.com"
-				required
-			/>
-
-			<label htmlFor="password">Password:</label>
-			<input
-				type="password"
-				name="password"
-				id="password"
-				placeholder="your password"
-				required
-				minlength="12"
-			/>
-
-			<input type="submit" value="Send" />
-		</form>
+		<h1>Todos REST api</h1>
+		<p>Get all todos: send get request to <i>/api/v1/todos</i>.</p>
+		<p>Get todo: send get request to <i>/api/v1/todos/id</i>.</p>
+		<p>
+			Update todo: send put request with <i>{title, status}</i> to
+			<i>/api/v1/todos/id</i>.
+		</p>
+		<p>
+			Add todo: send post request with <i>title</i> to <i>/api/v1/todos</i>.
+		</p>
+		<p>Delete todo: send delete request to <i>/api/v1/todos/id</i>.</p>
+		<p>
+			Update several todos: send patch request with array of todos to
+			<i>/api/v1/todos?action=update</i>.
+		</p>
+		<p>
+			Delete several todos: send patch request with array of ids of todos to
+			<i>/api/v1/todos?action=delete</i>.
+		</p>
 	</body>
 </html>
