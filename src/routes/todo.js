@@ -18,19 +18,19 @@ router.post("/", todoController.add);
 // Delete todo
 router.delete("/:todoId", todoController.remove);
 
-// Update\delete several todos
-router.patch("/", (req, res) => {
-	const { action } = req.query;
+// Middleware to handle router action
+function hasAction(action) {
+	return (req, _res, next) => {
+		if (req.query.action === action) {
+			next();
+		} else {
+			next("route");
+		}
+	};
+}
 
-	if (action === "delete") {
-		todoController.removeSeveral(req, res);
-		return;
-	}
+// Delete several todos
+router.patch("/", hasAction("delete"), todoController.removeSeveral);
 
-	if (action === "update") {
-		todoController.updateSeveral(req, res);
-		return;
-	}
-
-	res.sendStatus(400);
-});
+// Update several todos
+router.patch("/", hasAction("update"), todoController.updateSeveral);
