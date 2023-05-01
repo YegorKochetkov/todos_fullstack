@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import todoController from "./controllers/todos";
+import { router as todosRouter } from "./routes/todo.js";
 
 const corsOptions = {
 	origin: "http://localhost:5173",
@@ -12,38 +12,7 @@ const app = express();
 
 app.use(cors(corsOptions));
 app.use(express.static("public"));
-
-// Get all todos
-app.get("/api/v1/todos", todoController.getAll);
-
-// Get todo
-app.get("/api/v1/todos/:todoId", todoController.getOne);
-
-// Update todo
-app.put("/api/v1/todos/:todoId", express.json(), todoController.update);
-
-// Add todo
-app.post("/api/v1/todos", express.json(), todoController.add);
-
-// Delete todo
-app.delete("/api/v1/todos/:todoId", todoController.remove);
-
-// Update\delete several todos
-app.patch("/api/v1/todos", express.json(), (req, res) => {
-	const { action } = req.query;
-
-	if (action === "delete") {
-		todoController.removeSeveral(req, res);
-		return;
-	}
-
-	if (action === "update") {
-		todoController.updateSeveral(res, req);
-		return;
-	}
-
-	res.sendStatus(400);
-});
+app.use("/api/v1/todos", express.json(), todosRouter);
 
 app.use("/", (_req, res) => {
 	res.sendStatus(404);

@@ -1,4 +1,4 @@
-import todoService from "./services/todos.js";
+import todoService from "../services/todos.js";
 
 export function getAll(_req, res) {
 	const todos = todoService.getAll();
