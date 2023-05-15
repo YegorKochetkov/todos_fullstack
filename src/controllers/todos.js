@@ -1,24 +1,24 @@
 import todoService from "../services/todos.js";
 
-export function getAll(_req, res) {
-	const todos = todoService.getAll();
+export async function getAll(_req, res) {
+	const todos = await todoService.getAll();
 
-	res.send(todos);
+	res.send(todos.map(todoService.normalize));
 }
 
-export function getOne(req, res) {
+export async function getOne(req, res) {
 	const { todoId } = req.params;
-	const todo = todoService.getById(todoId);
+	const todo = await todoService.getById(todoId);
 
 	if (!todo) {
 		res.sendStatus(404);
 		return;
 	}
 
-	res.send(todo);
+	res.send(todoService.normalize(todo));
 }
 
-export function add(req, res) {
+export async function add(req, res) {
 	const { title } = req.body;
 
 	if (!title) {
@@ -26,29 +26,29 @@ export function add(req, res) {
 		return;
 	}
 
-	const newTodo = todoService.create(title);
+	const newTodo = await todoService.create(title);
 
 	res.statusCode = 201;
-	res.send(newTodo);
+	res.send(todoService.normalize(newTodo));
 }
 
-export function remove(req, res) {
+export async function remove(req, res) {
 	const { todoId } = req.params;
 
-	const todoToRemove = todoService.getById(todoId);
+	const todoToRemove = await todoService.getById(todoId);
 
 	if (!todoToRemove) {
 		res.sendStatus(404);
 		return;
 	}
 
-	todoService.remove(todoId);
+	await todoService.remove(todoId);
 	res.sendStatus(204);
 }
 
-export function update(req, res) {
+export async function update(req, res) {
 	const { todoId } = req.params;
-	const foundTodo = todoService.getById(todoId);
+	const foundTodo = await todoService.getById(todoId);
 
 	if (!foundTodo) {
 		res.sendStatus(404);
@@ -62,22 +62,29 @@ export function update(req, res) {
 		return;
 	}
 
-	const updatedTodo = todoService.update({ id: todoId, title, completed });
-	res.send(updatedTodo);
+	await todoService.update({
+		id: todoId,
+		title,
+		completed,
+	});
+
+	const updatedTodo = await todoService.getById(todoId);
+
+	res.send(todoService.normalize(updatedTodo));
 }
 
-export function removeSeveral(req, res) {
-	const { ids } = req.body;
+export async function updateSeveral(req, res) {
+	const { items } = req.body;
 
-	if (!Array.isArray(ids)) {
+	if (!Array.isArray(items)) {
 		res.sendStatus(422);
 		return;
 	}
 
 	try {
-		todoService.removeSeveral(ids);
+		await todoService.updateSeveral(items);
 	} catch (error) {
-		res.statusCode = 422;
+		res.statusCode = 400;
 		res.statusMessage = error.message;
 
 		res.end();
@@ -87,27 +94,25 @@ export function removeSeveral(req, res) {
 	res.sendStatus(204);
 }
 
-export function updateSeveral(req, res) {
-	const { items } = req.body;
+export async function removeSeveral(req, res) {
+	const { ids } = req.body;
 
-	if (!Array.isArray(items)) {
+	if (!Array.isArray(ids)) {
 		res.sendStatus(422);
 		return;
 	}
 
-	const errors = [];
+	try {
+		await todoService.removeSeveral(ids);
+	} catch (error) {
+		res.statusCode = 400;
+		res.statusMessage = error.message;
 
-	for (const { id, title, completed } of items) {
-		const foundTodo = todoService.getById(id);
-
-		if (foundTodo) {
-			todoService.update({ id, title, completed });
-		} else {
-			errors.push({ id, status: "NOT FOUND" });
-		}
+		res.end();
+		return;
 	}
 
-	res.send({ errors });
+	res.sendStatus(204);
 }
 
 const todoController = {
