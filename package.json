@@ -1,6 +1,6 @@
 {
 	"scripts": {
-		"start": "nodemon src/server.js",
+		"start": "nodemon src/server.js && node src/setup.js",
 		"format": "prettier --write src/ --ignore-path .gitignore",
 		"lint": "eslint --fix . --ignore-path .gitignore",
 		"format-lint": "npm run format && npm run lint",
