@@ -3,6 +3,7 @@ import todoService from "../services/todos.js";
 export async function getAll(_req, res) {
 	const todos = await todoService.getAll();
 
+	res.setHeader("Cache-Control", "s-max-age=1, stale-while-revalidate");
 	res.send(todos.map(todoService.normalize));
 }
 
