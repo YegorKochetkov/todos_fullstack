@@ -12,7 +12,12 @@
 	"rules": {
 		"indent": [
 			"error",
-			"tab"
+			"tab",
+			{
+				"ignoredNodes": [
+					"ConditionalExpression"
+				]
+			}
 		],
 		"linebreak-style": [
 			"error",

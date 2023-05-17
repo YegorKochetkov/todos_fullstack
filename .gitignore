@@ -3,3 +3,6 @@ someFolder
 
 .vscode
 .idea
+
+.vercel
+.env

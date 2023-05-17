@@ -1,4 +1,18 @@
-import { Sequelize } from "sequelize";
+import Sequelize from "sequelize";
+import pg from "pg";
+import * as dotenv from "dotenv";
+
+dotenv.config();
+
+let dialectOptions = {
+	ssl: {
+		require: true,
+	},
+};
+
+if (process.env.NODE_ENV === "local") {
+	dialectOptions = {};
+}
 
 export const sequelize = new Sequelize(
 	"postgres",
@@ -7,5 +21,6 @@ export const sequelize = new Sequelize(
 	{
 		host: "localhost",
 		dialect: "postgres",
+		dialectOptions,
 	}
 );

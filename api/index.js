@@ -1,14 +1,20 @@
+import * as dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import { router as todosRouter } from "./routes/todo.js";
+import { testConnection } from "./models/Todo.js";
 
+testConnection();
+
+dotenv.config();
+
+const origin = process.env.NODE_ENV === "local" ? "http://localhost:5173" : "*";
 const corsOptions = {
-	// origin: "http://localhost:5173",
-	origin: "*",
+	origin,
 	optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 
-const port = process.env.port || 3000;
+const port = process.env.PORT || 3000;
 const app = express();
 
 app.use(cors(corsOptions));
@@ -20,6 +26,8 @@ app.use("/", (_req, res) => {
 	res.sendStatus(404);
 });
 
-app.listen(port, () =>
-	console.log(`Express server is running on port ${port}`)
-);
+if (process.env.NODE_ENV === "local") {
+	app.listen(port, () =>
+		console.log(`Express server is running on http://localhost:${port}`)
+	);
+}

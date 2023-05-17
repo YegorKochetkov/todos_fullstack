@@ -1,5 +1,5 @@
-import { QueryTypes } from "sequelize";
-import { Todo } from "../models/Todo.js";
+import { Op } from "sequelize";
+import { Todo, testConnection } from "../models/Todo.js";
 import { sequelize } from "../utils/db.js";
 
 export function normalize({ id, title, completed }) {
@@ -21,7 +21,9 @@ export function create(title) {
 	return Todo.create({ title });
 }
 
-export function update({ id, title, completed }) {
+export async function update({ id, title, completed }) {
+	await testConnection();
+
 	return Todo.update(
 		{ title, completed },
 		{
@@ -46,29 +48,34 @@ export async function updateSeveral(todos) {
 			);
 		}
 
+		await testConnection();
 		await Promise.all(todosUpdatePromises);
 	});
 }
 
-export function remove(todoId) {
+export async function remove(todoId) {
+	await testConnection();
+
 	return Todo.destroy({
 		where: { id: todoId },
 	});
 }
 
 export async function removeSeveral(ids) {
-	return sequelize.query("DELETE FROM todos WHERE id IN (:ids)", {
-		replacements: { ids },
-		type: QueryTypes.BULKDELETE,
-	});
+	await testConnection();
 
-	// return Todo.destroy({
-	// 	where: {
-	// 		id: {
-	// 			[Op.in]: ids,
-	// 		},
-	// 	},
+	// return sequelize.query("DELETE FROM todos WHERE id IN (:ids)", {
+	// 	replacements: { ids },
+	// 	type: QueryTypes.BULKDELETE,
 	// });
+
+	return Todo.destroy({
+		where: {
+			id: {
+				[Op.in]: ids,
+			},
+		},
+	});
 }
 
 const todoService = {
