@@ -15,11 +15,12 @@ if (process.env.NODE_ENV === "local") {
 }
 
 export const sequelize = new Sequelize(
-	"postgres",
-	"postgres",
-	"Postgresqlpassword1",
+	process.env.POSTGRES_DATABASE,
+	process.env.POSTGRES_USER,
+	process.env.POSTGRES_PASSWORD,
 	{
-		host: "localhost",
+		host: process.env.POSTGRES_HOST,
+		dialectModule: pg,
 		dialect: "postgres",
 		dialectOptions,
 	}
