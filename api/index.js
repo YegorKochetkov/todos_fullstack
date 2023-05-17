@@ -31,3 +31,5 @@ if (process.env.NODE_ENV === "local") {
 		console.log(`Express server is running on http://localhost:${port}`)
 	);
 }
+
+export default app;
