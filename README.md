@@ -2,7 +2,7 @@
 
 - Get all todos: send **get** request to **_/api/v1/todos_**
 - Get todo: send **get** request to **_/api/v1/todos/id_**
-- Update todo: send **put** request with {title, status} to /api/v1/todos/id
+- Update todo: send **put** request with **_{title, status} to /api/v1/todos/id_**
 - Add todo: send **post** request with title to **_/api/v1/todos_**
 - Delete todo: send **delete** request to **_/api/v1/todos/id_**
 - Update several todos: send **patch** request with array of todos to **_/api/v1/todos?action=update_**
