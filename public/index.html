@@ -7,23 +7,25 @@
 	</head>
 	<body>
 		<h1>Todos REST API</h1>
-		<p>Get all todos: send get request to <i>/api/v1/todos</i>.</p>
-		<p>Get todo: send get request to <i>/api/v1/todos/id</i>.</p>
+		<p>Get all todos: send get request to <i>/api/v1/todos</i></p>
+		<p>Get todo: send get request to <i>/api/v1/todos/id</i></p>
 		<p>
-			Update todo: send put request with <i>{title, status}</i> to
-			<i>/api/v1/todos/id</i>.
+			Update todo: send put request with 
+			<i>{"title": "&lsaquo;new title&rsaquo;", "completed": &lsaquo;boolean&rsaquo;}</i> to
+			<i>/api/v1/todos/id</i>
 		</p>
 		<p>
-			Add todo: send post request with <i>title</i> to <i>/api/v1/todos</i>.
+			Add todo: send post request with <i>{"title": "&lsaquo;your title&rsaquo;"}</i> to 
+			<i>/api/v1/todos</i>
 		</p>
-		<p>Delete todo: send delete request to <i>/api/v1/todos/id</i>.</p>
+		<p>Delete todo: send delete request to <i>/api/v1/todos/id</i></p>
 		<p>
 			Update several todos: send patch request with array of todos to
-			<i>/api/v1/todos?action=update</i>.
+			<i>/api/v1/todos?action=update</i>
 		</p>
 		<p>
 			Delete several todos: send patch request with array of ids of todos to
-			<i>/api/v1/todos?action=delete</i>.
+			<i>/api/v1/todos?action=delete</i>
 		</p>
 	</body>
 </html>
